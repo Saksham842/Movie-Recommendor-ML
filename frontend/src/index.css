@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #f5c518;
+  --color-dark-gray: #111827;
+  --color-darker-gray: #030712;
+}
+
+@layer base {
+  body {
+    @apply bg-darker-gray text-white selection:bg-gold selection:text-black;
+  }
+}
+
+.glass {
+  @apply backdrop-blur-md bg-white/5 border border-white/10;
+}
+
+.gold-glow {
+  box-shadow: 0 0 20px rgba(245, 197, 24, 0.2);
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-darker-gray;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-gold/50 transition-colors;
+}
