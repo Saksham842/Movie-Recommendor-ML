@@ -7,3 +7,7 @@ node_modules/
 dist/
 .DS_Store
 *.csv
+
+# Legacy project folders
+movie-rec/
+resume-portfolio-build/
