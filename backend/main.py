@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from recommender import recommender
 import math
+import os
+import pandas as pd
 
 app = FastAPI(title="Resume Movie Recommender API")
 
@@ -12,6 +14,54 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ADD THIS — load raw movies CSV once on startup for home-data endpoint
+# This is separate from the ML dataframe and does not affect any existing logic
+_raw_movies_df = None
+def _get_raw_df():
+    global _raw_movies_df
+    if _raw_movies_df is None:
+        raw_path = "tmdb_5000_movies.csv"
+        if os.path.exists(raw_path):
+            _raw_movies_df = pd.read_csv(raw_path, usecols=["title", "vote_count", "vote_average", "genres", "overview"])
+    return _raw_movies_df
+
+def _parse_genres_str(genres_raw):
+    """Parse JSON-array genre string like '[{"id":..,"name":"Action"}]' to 'Action, Drama'."""
+    import ast
+    try:
+        parsed = ast.literal_eval(genres_raw)
+        return ", ".join(g["name"] for g in parsed if "name" in g)
+    except Exception:
+        return str(genres_raw)
+
+@app.get("/home-data")
+def home_data():
+    """Returns trending (top vote_count) and top_rated (high vote_average) movie lists."""
+    df = _get_raw_df()
+    if df is None:
+        return {"trending": [], "top_rated": []}
+
+    def row_to_dict(row):
+        return {
+            "title": row["title"],
+            "overview": row["overview"] if pd.notna(row["overview"]) else "",
+            "vote_average": round(float(row["vote_average"]), 1) if pd.notna(row["vote_average"]) else 0,
+            "genres": _parse_genres_str(row["genres"]),
+        }
+
+    trending_rows = df.sort_values("vote_count", ascending=False).head(20)
+    trending = [row_to_dict(r) for _, r in trending_rows.iterrows()]
+
+    top_rated_rows = (
+        df[df["vote_count"] > 500]
+        .sort_values("vote_average", ascending=False)
+        .head(20)
+    )
+    top_rated = [row_to_dict(r) for _, r in top_rated_rows.iterrows()]
+
+    return {"trending": trending, "top_rated": top_rated}
+# END ADD
 
 @app.get("/recommend")
 def recommend(title: str):

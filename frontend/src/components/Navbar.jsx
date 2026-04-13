@@ -1,11 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
-import { Film, BarChart2 } from 'lucide-react';
+import { Film } from 'lucide-react';
 
 export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
   const logoRef = useRef(null);
   const linksRef = useRef([]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const tl = gsap.timeline();
@@ -36,38 +45,44 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-md border-b border-white/5">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${isScrolled ? 'bg-gray-950/95 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link ref={logoRef} to="/" className="flex items-center gap-2.5 group">
-          <div className="bg-[#f5c518]/10 p-2 rounded-lg group-hover:bg-[#f5c518]/20 transition-colors">
-            <Film className="w-5 h-5 text-[#f5c518]" />
-          </div>
-          <span className="text-xl font-black tracking-tight text-white">
-            CineRec<span className="text-[#f5c518]">ML</span>
-          </span>
-        </Link>
+        
+        {/* Left Side: Logo & Links */}
+        <div className="flex items-center gap-8">
+          <Link ref={logoRef} to="/" className="flex items-center gap-2.5 group">
+            <Film className="w-6 h-6 text-red-600 drop-shadow-md" />
+            <span className="text-2xl font-black tracking-tight text-white drop-shadow-md">
+              CineRec<span className="text-red-600">ML</span>
+            </span>
+          </Link>
 
+          <div className="hidden md:flex items-center gap-4">
+            {navLinks.map((link, i) => (
+              <Link
+                key={link.to}
+                ref={(el) => (linksRef.current[i] = el)}
+                to={link.to}
+                className={`text-sm font-medium transition-colors drop-shadow-md ${
+                  location.pathname === link.to
+                    ? 'text-white'
+                    : 'text-gray-300 hover:text-gray-400'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: GitHub Button */}
         <div className="flex items-center gap-1">
-          {navLinks.map((link, i) => (
-            <Link
-              key={link.to}
-              ref={(el) => (linksRef.current[i] = el)}
-              to={link.to}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                location.pathname === link.to
-                  ? 'bg-[#f5c518]/10 text-[#f5c518]'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
           <a
             ref={(el) => (linksRef.current[navLinks.length] = el)}
             href="https://github.com"
             target="_blank"
             rel="noreferrer"
-            className="ml-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[#f5c518] text-gray-950 hover:bg-[#f5c518]/90 transition-colors"
+            className="px-4 py-1.5 rounded text-sm font-bold bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
           >
             GitHub
           </a>

@@ -30,3 +30,21 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-white/10 rounded-full hover:bg-gold/50 transition-colors;
 }
+
+/* ADD THIS — hide scrollbar for horizontal scroll rows */
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ADD THIS — infinite smooth marquee animation */
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+/* END ADD */

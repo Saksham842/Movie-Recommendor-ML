@@ -5,6 +5,9 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import MovieDetail from './pages/MovieDetail';
 import Dashboard from './pages/Dashboard';
+// ADD THIS
+import BackToTop from './components/BackToTop';
+// END ADD
 
 function App() {
   const location = useLocation();
@@ -19,6 +22,9 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </AnimatePresence>
+      {/* ADD THIS — rendered once outside all routes */}
+      <BackToTop />
+      {/* END ADD */}
     </div>
   );
 }
