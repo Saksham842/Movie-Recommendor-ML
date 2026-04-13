@@ -11,16 +11,16 @@ const API = 'http://localhost:8000';
 
 // ── Hardcoded TMDB backdrop URLs for hero rotation ──────────────────────────
 const BACKDROPS = [
-  'https://image.tmdb.org/t/p/original/hZk9YQ7onvBk19S6v8m99asfDHz.jpg', // Fight Club
-  'https://image.tmdb.org/t/p/original/hiKmj9vSpgD9S68L79q5U0e0v9q.jpg', // Parasite
-  'https://image.tmdb.org/t/p/original/s3TBrRGB1iav7gFOCNx3H31MoES.jpg', // Inception
-  'https://image.tmdb.org/t/p/original/gNBCvtYyGewR0GHUXaWEKF4QKRS.jpg', // Interstellar
-  'https://image.tmdb.org/t/p/original/hkBaDkMWbLaf8B1lsWsKX7Ew3Xq.jpg', // The Dark Knight
-  'https://image.tmdb.org/t/p/original/2Bh2kXdD684K23XlMoamMEFXbCv.jpg', // The Matrix
-  'https://image.tmdb.org/t/p/original/vI3aUGTuRRdM7J78KIdW98LdxE5.jpg', // John Wick
-  'https://image.tmdb.org/t/p/original/mZjZgY6ObiKtVuKVDrnS9VnuNlE.jpg', // The Shawshank Redemption
-  'https://image.tmdb.org/t/p/original/xJHokMbljvjEVAi06p04kUSGNDa.jpg', // Pulp Fiction
-  'https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0t5.jpg', // Avengers Endgame
+  'https://image.tmdb.org/t/p/w1280/hZk9YQ7onvBk19S6v8m99asfDHz.jpg', // Fight Club
+  'https://image.tmdb.org/t/p/w1280/hiKmj9vSpgD9S68L79q5U0e0v9q.jpg', // Parasite
+  'https://image.tmdb.org/t/p/w1280/s3TBrRGB1iav7gFOCNx3H31MoES.jpg', // Inception
+  'https://image.tmdb.org/t/p/w1280/gNBCvtYyGewR0GHUXaWEKF4QKRS.jpg', // Interstellar
+  'https://image.tmdb.org/t/p/w1280/hkBaDkMWbLaf8B1lsWsKX7Ew3Xq.jpg', // The Dark Knight
+  'https://image.tmdb.org/t/p/w1280/2Bh2kXdD684K23XlMoamMEFXbCv.jpg', // The Matrix
+  'https://image.tmdb.org/t/p/w1280/vI3aUGTuRRdM7J78KIdW98LdxE5.jpg', // John Wick
+  'https://image.tmdb.org/t/p/w1280/mZjZgY6ObiKtVuKVDrnS9VnuNlE.jpg', // The Shawshank Redemption
+  'https://image.tmdb.org/t/p/w1280/xJHokMbljvjEVAi06p04kUSGNDa.jpg', // Pulp Fiction
+  'https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1zUU3mTpHeQ0t5.jpg', // Avengers Endgame
 ];
 
 const GENRES = ['All', 'Action', 'Comedy', 'Drama', 'Thriller', 'Science Fiction', 'Horror', 'Romance', 'Animation', 'Crime'];

@@ -61,12 +61,12 @@
   background: rgba(245, 197, 24, 0.9);
 }
 
-/* ADD THIS — infinite smooth marquee animation */
+/* Performance-optimized infinite marquee (hardware accelerated) */
 .animate-marquee {
   animation: marquee 60s linear infinite;
+  will-change: transform;
 }
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
 }
-/* END ADD */

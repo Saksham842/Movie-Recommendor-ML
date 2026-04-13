@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 
-// ADD THIS — accept onClick (for modal) and compact (for horizontal grid rows) props
+
 export default function MovieCard({ movie, index = 0, onClick, compact = false }) {
   const navigate = useNavigate();
   const badgeRef = useRef(null);
@@ -28,7 +28,7 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
     }
   }, [movie.title, posterPath, imgError]);
 
-  // ADD THIS — GSAP count-up on similarity score badge
+  
   useEffect(() => {
     if (movie.similarity_score === undefined || !badgeRef.current) return;
     const counter = { val: 0 };
@@ -45,16 +45,16 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
     });
     return () => tween.kill();
   }, [movie.similarity_score, index]);
-  // END ADD
+  
 
   const handleClick = () => {
-    // ADD THIS — prefer modal callback if provided, else navigate
+    
     if (onClick) {
       onClick(movie);
     } else {
       navigate(`/movie/${encodeURIComponent(movie.title)}`);
     }
-    // END ADD
+    
   };
 
   return (
