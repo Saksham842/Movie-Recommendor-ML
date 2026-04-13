@@ -3,15 +3,7 @@ import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// ADD THIS — register ScrollToPlugin for smooth scroll-to-top
-gsap.registerPlugin(ScrollTrigger);
-try {
-  const { ScrollToPlugin } = require('gsap/ScrollToPlugin');
-  gsap.registerPlugin(ScrollToPlugin);
-} catch (e) {
-  // ScrollToPlugin not available, will use window.scrollTo fallback
-}
-// END ADD
+// Removed require('gsap/ScrollToPlugin') as it breaks Vite. Native smooth scrolling will be used.
 
 export default function BackToTop() {
   const btnRef = useRef(null);
@@ -39,13 +31,7 @@ export default function BackToTop() {
   }, []);
 
   const handleClick = () => {
-    // ADD THIS — try GSAP ScrollToPlugin, fallback to native
-    try {
-      gsap.to(window, { scrollTo: 0, duration: 0.8, ease: 'power3.inOut' });
-    } catch {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    // END ADD
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

@@ -60,7 +60,7 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
   return (
     <motion.div
       onClick={handleClick}
-      className={`movie-card relative aspect-[2/3] w-full bg-gray-900 rounded-md overflow-hidden cursor-pointer group shadow-lg ${compact ? '' : 'opacity-0'} origin-center flex items-center justify-center`}
+      className="movie-card relative aspect-[2/3] w-full bg-gray-900 rounded-md overflow-hidden cursor-pointer group/card shadow-lg origin-center flex items-center justify-center"
       whileHover={{ scale: 1.08, zIndex: 30 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
@@ -79,9 +79,8 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
           <span className="text-xs text-gray-400 font-medium leading-tight line-clamp-3 text-center">{movie.title}</span>
         </div>
       )}
-
       {/* Netflix-style Bottom Gradient Overlay (visible on hover) */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
         
         <h3 className="font-bold text-white text-base leading-snug mb-1 drop-shadow-md">
           {movie.title}
@@ -89,7 +88,9 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
         
         <div className="flex items-center gap-2 mb-2">
           {movie.vote_average > 0 && (
-            <span className="text-xs text-green-500 font-bold drop-shadow-md">{Math.round(movie.vote_average * 10)}% Match</span>
+            <span className="text-xs text-yellow-400 font-bold drop-shadow-md flex items-center gap-1">
+              ⭐ {movie.vote_average} IMDb
+            </span>
           )}
           <span className="border border-gray-400 text-gray-300 text-[10px] px-1 rounded-sm">HD</span>
         </div>

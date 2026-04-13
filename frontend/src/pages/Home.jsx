@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Search, Loader2, Sparkles } from 'lucide-react';
+import { Search, Loader2, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -11,11 +11,16 @@ const API = 'http://localhost:8000';
 
 // ── Hardcoded TMDB backdrop URLs for hero rotation ──────────────────────────
 const BACKDROPS = [
+  'https://image.tmdb.org/t/p/original/hZk9YQ7onvBk19S6v8m99asfDHz.jpg', // Fight Club
+  'https://image.tmdb.org/t/p/original/hiKmj9vSpgD9S68L79q5U0e0v9q.jpg', // Parasite
   'https://image.tmdb.org/t/p/original/s3TBrRGB1iav7gFOCNx3H31MoES.jpg', // Inception
   'https://image.tmdb.org/t/p/original/gNBCvtYyGewR0GHUXaWEKF4QKRS.jpg', // Interstellar
   'https://image.tmdb.org/t/p/original/hkBaDkMWbLaf8B1lsWsKX7Ew3Xq.jpg', // The Dark Knight
-  'https://image.tmdb.org/t/p/original/jtAI6OJIWLWiRItNSZoWjrsUtmi.jpg', // Avengers
   'https://image.tmdb.org/t/p/original/2Bh2kXdD684K23XlMoamMEFXbCv.jpg', // The Matrix
+  'https://image.tmdb.org/t/p/original/vI3aUGTuRRdM7J78KIdW98LdxE5.jpg', // John Wick
+  'https://image.tmdb.org/t/p/original/mZjZgY6ObiKtVuKVDrnS9VnuNlE.jpg', // The Shawshank Redemption
+  'https://image.tmdb.org/t/p/original/xJHokMbljvjEVAi06p04kUSGNDa.jpg', // Pulp Fiction
+  'https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0t5.jpg', // Avengers Endgame
 ];
 
 const GENRES = ['All', 'Action', 'Comedy', 'Drama', 'Thriller', 'Science Fiction', 'Horror', 'Romance', 'Animation', 'Crime'];
@@ -29,6 +34,57 @@ const pageVariants = {
 const sectionHeadingVariants = {
   initial: { opacity: 0, x: -30 },
   animate: { opacity: 1, x: 0 },
+};
+
+const GenreCarousel = ({ genre, movies }) => {
+  const rowRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (rowRef.current) {
+      const scrollAmount = window.innerWidth > 768 ? 600 : 300;
+      rowRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section 
+      id={`genre-section-${genre.toLowerCase().replace(/\s/g,'-')}`} 
+      className="max-w-7xl mx-auto px-6 py-10 border-t border-white/5 relative group"
+    >
+      <motion.h2
+        variants={sectionHeadingVariants}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="border-l-4 border-yellow-400 pl-3 text-xl font-bold text-white mb-6 uppercase tracking-wider"
+      >
+        {genre} Movies
+      </motion.h2>
+      
+      <button 
+        onClick={() => scroll('left')}
+        className="absolute left-6 top-1/2 mt-4 -translate-y-1/2 z-40 bg-black/80 hover:bg-yellow-400 hover:text-black text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 shadow-2xl backdrop-blur-md hidden md:flex items-center justify-center -ml-6"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      
+      <button 
+        onClick={() => scroll('right')}
+        className="absolute right-6 top-1/2 mt-4 -translate-y-1/2 z-40 bg-black/80 hover:bg-yellow-400 hover:text-black text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 shadow-2xl backdrop-blur-md hidden md:flex items-center justify-center -mr-6"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
+      <div ref={rowRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 pt-2 -mx-2 px-2 scroll-smooth">
+        {movies.map((movie, i) => (
+          <div key={`${movie.title}-${i}`} className="w-40 md:w-44 lg:w-48 shrink-0">
+            <MovieCard movie={movie} index={i} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export default function Home() {
@@ -49,9 +105,8 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
   const debounceTimer = useRef(null);
 
-  const [homeData, setHomeData] = useState({ trending: [], top_rated: [] });
+  const [homeData, setHomeData] = useState({ trending: [], top_rated: [], by_genre: {} });
   const [homeLoading, setHomeLoading] = useState(true);
-  const [activeGenre, setActiveGenre] = useState('All');
 
   // Hero backdrop rotation
   const [backdropIndex, setBackdropIndex] = useState(0);
@@ -131,26 +186,6 @@ export default function Home() {
     return () => hero.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // ── GSAP: search result cards ─────────────────────────────────────────────
-  useEffect(() => {
-    if (!results.length || !cardsContainerRef.current) return;
-    const cards = cardsContainerRef.current.querySelectorAll('.movie-card');
-    if (!cards.length) return;
-    
-    // Kill old triggers on re-search
-    ScrollTrigger.getAll().forEach(st => {
-      if (st.trigger === cardsContainerRef.current) st.kill();
-    });
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(cards, { opacity: 0, y: 40 }, {
-        opacity: 1, y: 0, stagger: 0.07, duration: 0.5, ease: 'power2.out',
-        scrollTrigger: { trigger: cardsContainerRef.current, start: 'top 85%' },
-      });
-    });
-    return () => ctx.revert();
-  }, [results]);
-
   // ── GSAP: horizontal grid rows ────────────────────────────────────────────
   // (Horizontal tracking is now strictly CSS-based via .animate-marquee for seamless infinite loop)
 
@@ -177,14 +212,17 @@ export default function Home() {
     debounceTimer.current = setTimeout(() => doSearch(val), 350);
   };
 
-  // ── Genre filter ──────────────────────────────────────────────────────────
-  const filterByGenre = (arr) => {
-    if (activeGenre === 'All') return arr;
-    return arr.filter(m => (m.genres || '').includes(activeGenre));
+  // ── Scroll to Genre ───────────────────────────────────────────────────────
+  const scrollToGenre = (genre) => {
+    const el = document.getElementById(`genre-section-${genre.toLowerCase().replace(/\s/g,'-')}`);
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 80; // Offset for any fixed navs
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
   };
 
-  const filteredTrending = filterByGenre(homeData.trending || []);
-  const filteredTopRated = filterByGenre(homeData.top_rated || []);
+  const trendingMovies = homeData.trending || [];
+  const topRatedMovies = homeData.top_rated || [];
 
   // ── Skeleton loader ───────────────────────────────────────────────────────
   const SkeletonRow = () => (
@@ -307,24 +345,68 @@ export default function Home() {
       {/* ── Below hero content ── */}
       <div className="bg-gray-950">
 
-        {/* ── Genre Filter Bar ── */}
-        <section className="max-w-7xl mx-auto px-6 pt-12 pb-2">
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-            {GENRES.map(genre => (
-              <motion.button
-                key={genre}
-                id={`genre-chip-${genre.toLowerCase().replace(/\s/g,'-')}`}
-                whileTap={{ scale: 0.93 }}
-                onClick={() => setActiveGenre(genre)}
-                className={`px-4 py-1.5 rounded-full text-sm cursor-pointer shrink-0 transition-colors ${
-                  activeGenre === genre
-                    ? 'bg-yellow-400 text-gray-950 font-semibold'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                {genre}
-              </motion.button>
-            ))}
+        {/* ── Search Results (Rendered at top when active) ── */}
+        <AnimatePresence mode="wait">
+          {hasSearched && (
+            <motion.section
+              key="search-results"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="max-w-7xl mx-auto px-6 py-16 min-h-[50vh]"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="border-l-4 border-yellow-400 pl-3 text-2xl font-bold text-white">
+                  {results.length > 0 ? (
+                    <><span className="text-[#f5c518]">{results.length}</span> results for "<span className="text-[#f5c518]">{query}</span>"</>
+                  ) : (
+                    <>No results for "<span className="text-gray-400">{query}</span>"</>
+                  )}
+                </h2>
+              </div>
+
+              <div ref={cardsContainerRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                {results.map((movie, i) => (
+                  <MovieCard key={movie.title + i} movie={movie} index={i} />
+                ))}
+              </div>
+
+              {results.length === 0 && (
+                <div className="text-center py-24 text-gray-600">
+                  <span className="text-6xl block mb-4">🎬</span>
+                  <p className="text-lg">No movies match your search. Try a different title.</p>
+                  <p className="text-sm mt-1">Hint: Search works best with exact titles like "The Matrix" or "Toy Story".</p>
+                </div>
+              )}
+            </motion.section>
+          )}
+        </AnimatePresence>
+
+        {/* ── Generic Home Sections (Hidden when searching) ── */}
+        <AnimatePresence mode="wait">
+          {!hasSearched && (
+            <motion.div
+              key="home-sections"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {/* ── Genre Filter Bar ── */}
+              <section className="max-w-7xl mx-auto px-6 pt-12 pb-2">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 justify-center">
+            {GENRES.map(genre => {
+              if (genre === 'All') return null; // 'All' is implicitly the whole page now
+              return (
+                <motion.button
+                  key={genre}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => scrollToGenre(genre)}
+                  className="px-4 py-1.5 rounded-full text-sm cursor-pointer shrink-0 transition-colors bg-gray-800 text-gray-300 hover:bg-yellow-400 hover:text-gray-950 font-medium"
+                >
+                  {genre}
+                </motion.button>
+              );
+            })}
           </div>
         </section>
 
@@ -343,7 +425,7 @@ export default function Home() {
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={`trending-${activeGenre}`}
+              key="trending-movies"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -353,18 +435,18 @@ export default function Home() {
                 <SkeletonRow />
               ) : (
                 <div className="flex overflow-hidden relative w-full group">
-                  <div className="flex gap-4 w-max animate-marquee pb-4 group-hover:[animation-play-state:paused]">
-                    {filteredTrending.length === 0 ? (
-                      <p className="text-gray-600 text-sm py-8">No movies in this genre.</p>
+                  <div className="flex gap-4 w-max animate-marquee pb-4">
+                    {trendingMovies.length === 0 ? (
+                      <p className="text-gray-600 text-sm py-8">No movies available.</p>
                     ) : (
                       <>
-                        {filteredTrending.map((movie, i) => (
+                        {trendingMovies.map((movie, i) => (
                           <div key={`trend1-${movie.title}-${i}`} className="w-44 lg:w-48 shrink-0">
                             <MovieCard movie={movie} index={i} compact />
                           </div>
                         ))}
                         {/* Duplicate for infinite loop */}
-                        {filteredTrending.map((movie, i) => (
+                        {trendingMovies.map((movie, i) => (
                           <div key={`trend2-${movie.title}-${i}`} className="w-44 lg:w-48 shrink-0">
                             <MovieCard movie={movie} index={i} compact />
                           </div>
@@ -393,7 +475,7 @@ export default function Home() {
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={`toprated-${activeGenre}`}
+              key="toprated-movies"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -403,18 +485,18 @@ export default function Home() {
                 <SkeletonRow />
               ) : (
                 <div className="flex overflow-hidden relative w-full group">
-                  <div className="flex gap-4 w-max animate-marquee pb-4 group-hover:[animation-play-state:paused]">
-                    {filteredTopRated.length === 0 ? (
-                      <p className="text-gray-600 text-sm py-8">No movies in this genre.</p>
+                  <div className="flex gap-4 w-max animate-marquee pb-4">
+                    {topRatedMovies.length === 0 ? (
+                      <p className="text-gray-600 text-sm py-8">No movies available.</p>
                     ) : (
                       <>
-                        {filteredTopRated.map((movie, i) => (
+                        {topRatedMovies.map((movie, i) => (
                           <div key={`top1-${movie.title}-${i}`} className="w-44 lg:w-48 shrink-0">
                             <MovieCard movie={movie} index={i} compact />
                           </div>
                         ))}
                         {/* Duplicate for infinite loop */}
-                        {filteredTopRated.map((movie, i) => (
+                        {topRatedMovies.map((movie, i) => (
                           <div key={`top2-${movie.title}-${i}`} className="w-44 lg:w-48 shrink-0">
                             <MovieCard movie={movie} index={i} compact />
                           </div>
@@ -428,39 +510,16 @@ export default function Home() {
           </AnimatePresence>
         </section>
 
-        {/* ── Search Results ── */}
-        <AnimatePresence>
-          {hasSearched && (
-            <motion.section
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="max-w-7xl mx-auto px-6 py-16"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="border-l-4 border-yellow-400 pl-3 text-2xl font-bold text-white">
-                  {results.length > 0 ? (
-                    <><span className="text-[#f5c518]">{results.length}</span> results for "<span className="text-[#f5c518]">{query}</span>"</>
-                  ) : (
-                    <>No results for "<span className="text-gray-400">{query}</span>"</>
-                  )}
-                </h2>
-              </div>
+        {/* ── Static Genre Grids ── */}
+        {GENRES.map(genre => {
+          if (genre === 'All') return null;
+          const movies = homeData.by_genre ? homeData.by_genre[genre] || [] : [];
+          if (movies.length === 0) return null;
 
-              <div ref={cardsContainerRef} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                {results.map((movie, i) => (
-                  <MovieCard key={movie.title + i} movie={movie} index={i} />
-                ))}
-              </div>
+          return <GenreCarousel key={genre} genre={genre} movies={movies} />;
+        })}
 
-              {results.length === 0 && (
-                <div className="text-center py-24 text-gray-600">
-                  <span className="text-6xl block mb-4">🎬</span>
-                  <p className="text-lg">No movies match your search. Try a different title.</p>
-                  <p className="text-sm mt-1">Hint: Search works best with exact titles like "The Matrix" or "Toy Story".</p>
-                </div>
-              )}
-            </motion.section>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>

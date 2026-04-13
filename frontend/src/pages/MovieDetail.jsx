@@ -7,6 +7,7 @@ import { ArrowLeft, Brain, Zap } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 
 const API = 'http://localhost:8000';
+const TMDB_KEY = '4e44d9029b1270a757cddc766a1bcb63';
 const GOLD = '#f5c518';
 
 const pageVariants = {
@@ -52,6 +53,7 @@ export default function MovieDetail() {
   const [movie, setMovie] = useState(null);
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [posterUrl, setPosterUrl] = useState(null);
 
   const barsRef = useRef(null);
   const chartDataRef = useRef([]);
@@ -69,6 +71,14 @@ export default function MovieDetail() {
         const recData = await recRes.json();
         setMovie(detail);
         setRecs(recData.recommendations || []);
+
+        // Fetch actual poster from TMDB if available
+        const tmdbRes = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(decodedTitle)}`);
+        const tmdbData = await tmdbRes.json();
+        if (tmdbData.results?.length > 0) {
+          const mainResult = tmdbData.results[0];
+          setPosterUrl(`https://image.tmdb.org/t/p/w500${mainResult.poster_path}`);
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -92,7 +102,7 @@ export default function MovieDetail() {
   }, [recs]);
 
   const chartData = recs.slice(0, 10).map((r) => ({
-    title: r.title.length > 18 ? r.title.slice(0, 18) + '…' : r.title,
+    title: r.title, // No longer truncating names
     score: r.similarity_score,
   }));
 
@@ -131,19 +141,30 @@ export default function MovieDetail() {
 
         {/* ── Top Section ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
-          {/* Faux Poster */}
+          {/* Movie Poster */}
           <div className="md:col-span-1">
-            <div className="aspect-[2/3] bg-gray-900 rounded-2xl border border-white/5 flex items-center justify-center text-center p-6">
-              <div>
-                <span className="text-6xl block mb-3">🎬</span>
-                <span className="text-white font-bold text-sm leading-tight">{movie.title}</span>
-              </div>
+            <div className="aspect-[2/3] bg-gray-900 rounded-2xl border border-white/5 overflow-hidden group shadow-2xl relative">
+              {posterUrl ? (
+                <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
+                  <span className="text-6xl block mb-3">🎬</span>
+                  <span className="text-white font-bold text-sm leading-tight">{movie.title}</span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Details */}
           <div className="md:col-span-2 flex flex-col justify-center">
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-3 leading-tight">{movie.title}</h1>
+            <div className="flex items-center gap-4 mb-4">
+              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight">{movie.title}</h1>
+              {movie.vote_average > 0 && (
+                <div className="bg-yellow-400 text-black px-3 py-1 rounded-lg font-black text-sm flex items-center shrink-0">
+                  ⭐ {movie.vote_average}
+                </div>
+              )}
+            </div>
             {movie.genre && (
               <p className="text-[#f5c518] font-semibold text-sm mb-5">{movie.genre}</p>
             )}
@@ -187,10 +208,11 @@ export default function MovieDetail() {
             <Brain className="w-6 h-6 text-[#f5c518]" />
           </div>
           <div>
-            <h3 className="text-white font-bold mb-2">How the ML Engine Found These Matches</h3>
+            <h3 className="text-white font-bold mb-2">Decoding the Recommendation DNA</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              <strong className="text-white">TF-IDF</strong> scores every word in a movie's "soup" (genre + cast + director + plot overview) by how uniquely important it is to <em>this</em> movie versus all 5,000 others — common words like "the" get penalized, rare ones get amplified.
-              <strong className="text-white"> Cosine similarity</strong> then measures the angle between each movie's word-vector, finding films whose TF-IDF fingerprints overlap the most.
+              Our engine uses <strong className="text-white">TF-IDF (Term Frequency-Inverse Document Frequency)</strong> to analyze plot summaries, cast, and genres. 
+              The <span className="text-[#f5c518] font-semibold">keywords above</span> are the most "defining" terms for <span className="text-white">"{movie.title}"</span>—meaning they appear frequently here but rarely in other films. 
+              By calculating the <strong className="text-white">Cosine Similarity</strong> between these word signatures, we find movies that share the exact same cinematic fingerprints.
             </p>
           </div>
         </motion.div>

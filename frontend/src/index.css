@@ -23,6 +23,7 @@
 /* Scrollbar styling for dark theme */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-darker-gray;
@@ -31,7 +32,7 @@
   @apply bg-white/10 rounded-full hover:bg-gold/50 transition-colors;
 }
 
-/* ADD THIS — hide scrollbar for horizontal scroll rows */
+/* hide scrollbar for horizontal scroll rows where needed */
 .scrollbar-hide {
   scrollbar-width: none;
 }
@@ -39,9 +40,30 @@
   display: none;
 }
 
+/* Beautiful custom scrollbar for horizontal genre grids */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 197, 24, 0.5) rgba(255, 255, 255, 0.05); /* gold thumb, subtle track */
+}
+.scrollbar-custom::-webkit-scrollbar {
+  height: 10px;
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: rgba(245, 197, 24, 0.6);
+  border-radius: 8px;
+  border: 2px solid #030712; /* space around thumb */
+}
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 197, 24, 0.9);
+}
+
 /* ADD THIS — infinite smooth marquee animation */
 .animate-marquee {
-  animation: marquee 35s linear infinite;
+  animation: marquee 60s linear infinite;
 }
 @keyframes marquee {
   0% { transform: translateX(0%); }

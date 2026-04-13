@@ -60,7 +60,14 @@ def home_data():
     )
     top_rated = [row_to_dict(r) for _, r in top_rated_rows.iterrows()]
 
-    return {"trending": trending, "top_rated": top_rated}
+    target_genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Science Fiction', 'Horror', 'Romance', 'Animation', 'Crime']
+    by_genre = {}
+    for g in target_genres:
+        mask = df["genres"].astype(str).str.contains(g, case=False, na=False)
+        g_rows = df[mask].sort_values("vote_count", ascending=False).head(50)
+        by_genre[g] = [row_to_dict(r) for _, r in g_rows.iterrows()]
+
+    return {"trending": trending, "top_rated": top_rated, "by_genre": by_genre}
 # END ADD
 
 @app.get("/recommend")
@@ -68,6 +75,17 @@ def recommend(title: str):
     res = recommender.get_recommendations(title, n=10)
     if not res:
         raise HTTPException(status_code=404, detail="Movie not found or dataset empty")
+    
+    # Enrich with vote_average from raw DF
+    df = _get_raw_df()
+    if df is not None:
+        for r in res:
+            match = df[df['title'].str.lower() == r['title'].lower()]
+            if not match.empty:
+                r["vote_average"] = round(float(match.iloc[0]["vote_average"]), 1)
+            else:
+                r["vote_average"] = 0
+                
     return {"recommendations": res}
 
 @app.get("/search")
@@ -79,7 +97,7 @@ def search(q: str):
     matches = recommender.df[recommender.df['title'].str.lower().str.contains(term, na=False)]
     
     results = []
-    for row in matches.head(10).itertuples():
+    for row in matches.itertuples():
         genre_str = ", ".join(row.genres).title() if isinstance(row.genres, list) else ""
         results.append({
             "title": row.title,
@@ -102,11 +120,19 @@ def get_movie(title: str):
     genre_str = ", ".join(row.genres).title() if isinstance(row.genres, list) else ""
     top_features = recommender.get_top_features_for_movie(title, top_n=5)
     
+    vote_average = 0
+    df = _get_raw_df()
+    if df is not None:
+        match = df[df['title'].str.lower() == title.lower()]
+        if not match.empty:
+            vote_average = round(float(match.iloc[0]["vote_average"]), 1)
+    
     return {
         "title": row.title,
         "genre": genre_str,
         "overview": row.overview,
-        "top_features": top_features
+        "top_features": top_features,
+        "vote_average": vote_average
     }
 
 @app.get("/dashboard")

@@ -17,24 +17,34 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const tl = gsap.timeline();
+    let ctx = gsap.context(() => {
+      const tl = gsap.timeline();
 
-    // Logo slides in from left
-    tl.from(logoRef.current, {
-      x: -80,
-      opacity: 0,
-      duration: 0.7,
-      ease: 'power3.out',
+      // Logo slides in from left
+      tl.fromTo(logoRef.current, {
+        x: -80,
+        opacity: 0,
+      }, {
+        x: 0,
+        opacity: 1,
+        duration: 0.7,
+        ease: 'power3.out',
+      });
+
+      // Nav links stagger in from top
+      tl.fromTo(linksRef.current, {
+        y: -30,
+        opacity: 0,
+      }, {
+        y: 0,
+        opacity: 1,
+        stagger: 0.1,
+        duration: 0.5,
+        ease: 'power2.out',
+      }, '-=0.3');
     });
 
-    // Nav links stagger in from top
-    tl.from(linksRef.current, {
-      y: -30,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.5,
-      ease: 'power2.out',
-    }, '-=0.3');
+    return () => ctx.revert();
   }, []);
 
   const location = useLocation();
@@ -75,18 +85,6 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Right Side: GitHub Button */}
-        <div className="flex items-center gap-1">
-          <a
-            ref={(el) => (linksRef.current[navLinks.length] = el)}
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            className="px-4 py-1.5 rounded text-sm font-bold bg-red-600 text-white hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
-          >
-            GitHub
-          </a>
-        </div>
       </div>
     </nav>
   );
