@@ -1,12 +1,17 @@
 venv/
 __pycache__/
-*.pkl
 *.pyc
 .env
 node_modules/
 dist/
 .DS_Store
+
+# Exclude large raw data file not needed at runtime
+backend/tmdb_5000_credits.csv
+
+# Exclude all other csvs except the runtime movie file
 *.csv
+!backend/tmdb_5000_movies.csv
 
 # Legacy project folders
 movie-rec/
