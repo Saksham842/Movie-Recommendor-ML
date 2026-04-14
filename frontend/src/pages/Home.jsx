@@ -453,7 +453,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="border-l-4 border-yellow-400 pl-3 text-xl font-bold text-white mb-4"
           >
-            🔥 Trending Now
+             Trending Now
           </motion.h2>
 
           <AnimatePresence mode="wait">
@@ -503,7 +503,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="border-l-4 border-yellow-400 pl-3 text-xl font-bold text-white mb-4"
           >
-            ⭐ Top Rated
+             Top Rated
           </motion.h2>
 
           <AnimatePresence mode="wait">

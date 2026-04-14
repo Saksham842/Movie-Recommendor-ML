@@ -1,88 +1,102 @@
-# CineRecML: AI-Powered Movie Discovery Engine
+# 🎬 CineRecML : AI-Powered Cinematic Discovery Engine
 
-![Status](https://img.shields.io/badge/Status-Project--Ready-success?style=for-the-badge)
-![Tech](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
-![Tech](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react)
-![Tech](https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://movie-recommendor-ml.vercel.app/)
+[![Backend API](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://movie-recommendor-ml-1.onrender.com/docs)
+![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![ML](https://img.shields.io/badge/Scikit_Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
-CineRecML is a professional, full-stack movie recommendation system that analyzes the "cinematic DNA" of over 5,000 films. By utilizing Natural Language Processing (NLP) techniques like TF-IDF vectorization and Cosine Similarity, the engine maps structural overlaps in plot summaries, director styles, and cast compositions to deliver deeply relevant suggestions.
-
-## 🎬 Key Features
-
-- **Vector-Based Discovery**: Moves beyond simple title matching to analyze plot structures and multi-feature similarity.
-- **High-Fidelity Interface**: A Netflix-inspired UI built with **Framer Motion** and **GSAP** for fluid, 60FPS animations.
-- **Interactive Insights**: Real-time visualization of TF-IDF feature importance using **Recharts**.
-- **Dynamic Data Enrichment**: Real-time integration with the **TMDB API** for high-resolution posters and IMDb ratings.
-
-## 🧠 The Engineering Behind the Engine
-
-### Machine Learning Pipeline
-- **Preprocessing**: Cleans and Tokenizes plot summaries, cast lists, and genres into a consolidated metadata "soup".
-- **TF-IDF Vectorization**: Converters text data into a high-dimensional feature matrix, weighting unique keywords more heavily than common stop words.
-- **Cosine Similarity**: Calculates the angular distance between film vectors in 5,000-dimensional space to determine similarity rankings.
-
-### Backend Infrastructure
-- **FastAPI Core**: A high-performance Python backend serving recommendations in ~0.02s.
-- **Vector Space Persistence**: Uses `pickle` to store pre-computed similarity matrices for zero-latency inference.
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 19, Vite, Tailwind CSS 4, Framer Motion, GSAP, Recharts.
-- **Backend**: FastAPI (Python), Pandas, Scikit-Learn.
-- **Data Source**: TMDB 5,000 Movies Dataset.
-
-## 🚀 Local Setup
-
-1. **Clone & Install Dependencies**
-   ```bash
-   # Backend
-   cd backend
-   pip install -r requirements.txt
-   
-   # Frontend
-   cd ../frontend
-   npm install
-   ```
-
-2. **Preprocess Dataset**
-   ```bash
-   python backend/preprocess.py
-   ```
-
-3. **Run Application**
-   ```bash
-   # Terminal 1: Backend
-   python -m uvicorn main:app --reload
-   
-   # Terminal 2: Frontend
-   npm run dev
-   ```
-
-## 📈 Resume-Ready Highlights
-
-- Engineered a full-stack recommendation engine processing **5,000+ data points** with **~20ms inference time**.
-- Implemented **TF-IDF NLP pipelines** to map cinematic similarity across high-dimensional feature spaces.
-- Orchestrated a modern UI using **React 19** and **GSAP**, achieving fluid animations and an **80% reduction in image payload size** through asset optimization.
-
-## 🚀 Production Deployment
-
-This project is designed for zero-config deployment on **Render** (Backend) and **Vercel** (Frontend).
-
-### 1. Backend: Render
-1.  **Create Web Service**: Connect your GitHub repository.
-2.  **Environment**: Select `Python` and set the following settings:
-    - **Root Directory**: `backend` (CRITICAL)
-    - **Build Command**: `pip install -r requirements.txt`
-    - **Start Command**: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
-3.  **Advanced**: Add `PYTHON_VERSION` if necessary (e.g., `3.10.x`).
-
-### 2. Frontend: Vercel
-1.  **Project Setup**: Import your repository.
-2.  **Framework**: Select `Vite`.
-3.  **Root Directory**: Set to `frontend`.
-4.  **Environment Variables**: Add the following in the Vercel Dashboard:
-    - `VITE_TMDB_KEY`: Your TMDB API Key.
-    - `VITE_API_BASE_URL`: The URL provided by Render (e.g., `https://your-api.onrender.com`).
+> **CineRecML** is a high-performance content recommendation engine that analyzes the "cinematic DNA" of over 5,000 films. Moving beyond basic genre matching, it utilizes Natural Language Processing (NLP) to map complex structural overlaps in plot narratives, directorial styles, and cast compositions.
 
 ---
-*Created by [Saksham](https://github.com/Saksham842)*
+
+## 🚀 Overview
+
+When users search for a movie, the ML engine maps it into a 5,000-dimensional vector space, instantly retrieving mathematically similar films. This project demonstrates end-to-end Machine Learning engineering—from data sanitization and algorithmic processing to a fluid, Netflix-inspired full-stack application.
+
+### 🔗 Live Links
+* **Frontend Platform:** [CineRecML on Vercel](https://movie-recommendor-ml.vercel.app/)
+* **Backend API Docs:** [FastAPI Swagger UI](https://movie-recommendor-ml-1.onrender.com/docs)
+
+---
+
+## 🧠 The Machine Learning Engine
+
+The core of this application relies on a custom-built NLP pipeline:
+* **Data Preprocessing:** Ingests the TMDB 5k dataset, cleaning and tokenizing plot summaries, cast lists, crews, and keywords into a consolidated metadata matrix.
+* **TF-IDF Vectorization:** Transforms textual data into numerical vectors. It leverages Term Frequency-Inverse Document Frequency to penalize common filler words and reward highly specific narrative keywords.
+* **Cosine Similarity:** Computes the angular distance between film vectors in multi-dimensional space, ranking the top recommendations with ~0.02s inference latency.
+
+---
+
+## 💻 Technical Architecture
+
+**Frontend (The Interface)**
+* **Framework:** React 19 + Vite
+* **Styling & UI:** Tailwind CSS v4, custom glassmorphism components
+* **Animation Engine:** Framer Motion (page transitions) + GSAP (scroll-triggered micro-interactions)
+* **Data Visualization:** Recharts (displaying real-time TF-IDF keyword weights)
+
+**Backend (The Brain)**
+* **Framework:** FastAPI (Python)
+* **ML Stack:** Pandas, NumPy, Scikit-Learn
+* **Optimization:** Pre-computed similarity matrices serialized via `pickle` for zero-latency inference, served dynamically via REST endpoints.
+
+**Deployment & DevOps**
+* **Vercel:** Frontend hosting with optimized environment variable injection.
+* **Render:** Backend hosting using `gunicorn` and `uvicorn.workers.UvicornWorker` for production-grade concurrency.
+
+---
+
+## 🌟 Key Features
+* **Vector-Based Discovery:** Deep analytical matching rather than simple string comparisons.
+* **Interactive ML Insights:** Explains the "Why" behind recommendations by visualizing the underlying algorithm's keyword weighting directly in the UI.
+* **Cold-Start Resilience:** Custom React hooks designed to handle cloud provider cold starts gracefully, preventing request timeouts.
+* **Optimized Asset Delivery:** Dynamic resolution scaling for TMDB images, reducing network payload by ~80% for seamless 60FPS scrolling.
+
+---
+
+## 📈 Resume-Ready Highlights
+*For hiring managers and engineering leaders reviewing this repository:*
+- **Engineered a scalable NLP pipeline** processing 5,000+ data points, achieving sub-20ms inference time using TF-IDF and Cosine Similarity algorithms.
+- **Architected a decoupled microservice architecture**, connecting a Python/FastAPI ML engine to a modern React interface.
+- **Resolved strict production blockades**, including CORS routing, monorepo deployment configurations (Vercel + Render), and hardware-accelerated CSS animations.
+
+---
+
+## 🛠 Local Setup Instructions
+
+To run this project locally on your machine:
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Saksham842/Movie-Recommendor-ML.git
+cd Movie-Recommendor-ML
+```
+
+### 2. Start the Backend API
+```bash
+cd backend
+pip install -r requirements.txt
+python -m uvicorn main:app --reload
+```
+*The API will be available at `http://localhost:8000`*
+
+### 3. Start the Frontend
+Open a new terminal window:
+```bash
+cd frontend
+npm install
+
+# Set up your environment variables
+echo VITE_API_BASE_URL=http://localhost:8000 > .env
+echo VITE_TMDB_KEY=your_tmdb_api_key_here >> .env
+
+# Start the dev server
+npm run dev
+```
+*The UI will be available at `http://localhost:5173`*
+
+---
+*Architected and Engineered by [Saksham](https://github.com/Saksham842)*
