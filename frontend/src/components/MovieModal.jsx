@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { Loader2, X, ChevronDown, ChevronUp } from 'lucide-react';
 import MovieCard from './MovieCard';
 
-const API = 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const backdropVariants = {
   hidden: { opacity: 0 },

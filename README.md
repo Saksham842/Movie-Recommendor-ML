@@ -71,6 +71,7 @@ This project is designed for zero-config deployment on **Render** (Backend) and 
 ### 1. Backend: Render
 1.  **Create Web Service**: Connect your GitHub repository.
 2.  **Environment**: Select `Python` and set the following settings:
+    - **Root Directory**: `backend` (CRITICAL)
     - **Build Command**: `pip install -r requirements.txt`
     - **Start Command**: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
 3.  **Advanced**: Add `PYTHON_VERSION` if necessary (e.g., `3.10.x`).

@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API = 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const GOLD = '#f5c518';
 
 const pageVariants = {
