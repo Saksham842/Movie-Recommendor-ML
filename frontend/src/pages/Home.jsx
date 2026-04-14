@@ -111,19 +111,36 @@ export default function Home() {
   // Hero backdrop rotation
   const [backdropIndex, setBackdropIndex] = useState(0);
 
-  // ── Fetch /home-data ─────────────────────────────────────────────────────
+  // ── Fetch /home-data (with cold-start retry for Render free tier) ──────────
+  const [warmingUp, setWarmingUp] = useState(false);
+
   useEffect(() => {
+    let cancelled = false;
     (async () => {
-      try {
-        const res = await fetch(`${API}/home-data`);
-        const data = await res.json();
-        setHomeData(data);
-      } catch {
-        setHomeData({ trending: [], top_rated: [] });
-      } finally {
-        setHomeLoading(false);
-      }
+      const attemptFetch = async (attempt) => {
+        try {
+          const res = await fetch(`${API}/home-data`);
+          if (!res.ok) throw new Error(`Status ${res.status}`);
+          const data = await res.json();
+          // If empty and it's a cold start, retry once after 15s
+          if ((!data.trending || data.trending.length === 0) && attempt === 1) {
+            if (cancelled) return;
+            setWarmingUp(true);
+            await new Promise(r => setTimeout(r, 15000));
+            if (cancelled) return;
+            setWarmingUp(false);
+            return attemptFetch(2);
+          }
+          if (!cancelled) setHomeData(data);
+        } catch {
+          if (!cancelled) setHomeData({ trending: [], top_rated: [] });
+        } finally {
+          if (!cancelled) setHomeLoading(false);
+        }
+      };
+      await attemptFetch(1);
     })();
+    return () => { cancelled = true; };
   }, []);
 
   // ── Backdrop rotation ─────────────────────────────────────────────────────
@@ -238,6 +255,22 @@ export default function Home() {
 
   return (
     <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.4 }}>
+
+      {/* ── Warming-up banner (Render cold start) ── */}
+      <AnimatePresence>
+        {warmingUp && (
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            className="fixed top-16 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-yellow-400 text-gray-950 text-sm font-semibold px-5 py-3 rounded-full shadow-xl"
+          >
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Waking up the server… this takes ~15s on first load
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── HERO ── */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gray-950 px-6">
 
