@@ -21,9 +21,15 @@ _raw_movies_df = None
 def _get_raw_df():
     global _raw_movies_df
     if _raw_movies_df is None:
-        raw_path = "tmdb_5000_movies.csv"
+        # Use absolute path relative to main.py
+        base_dir = os.path.dirname(__file__)
+        raw_path = os.path.join(base_dir, "tmdb_5000_movies.csv")
+        print(f"DEBUG: Looking for raw CSV at {raw_path}")
         if os.path.exists(raw_path):
+            print("DEBUG: CSV found! Loading...")
             _raw_movies_df = pd.read_csv(raw_path, usecols=["title", "vote_count", "vote_average", "genres", "overview"])
+        else:
+            print("DEBUG: CSV NOT FOUND!")
     return _raw_movies_df
 
 def _parse_genres_str(genres_raw):

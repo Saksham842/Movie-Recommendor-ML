@@ -10,11 +10,18 @@ class Recommender:
         self.vectorizer = None
         self.cosine_sim = None
         
-        if os.path.exists("processed_df.pkl"):
-            self.load_models()
+        # Use absolute path relative to recommender.py
+        base_dir = os.path.dirname(__file__)
+        pkl_path = os.path.join(base_dir, "processed_df.pkl")
+        print(f"DEBUG: Looking for model at {pkl_path}")
+        if os.path.exists(pkl_path):
+            print("DEBUG: Model found! Loading...")
+            self.load_models(pkl_path)
+        else:
+            print("DEBUG: Model NOT FOUND!")
 
-    def load_models(self):
-        self.df = pd.read_pickle("processed_df.pkl")
+    def load_models(self, path):
+        self.df = pd.read_pickle(path)
         self.vectorizer = TfidfVectorizer(stop_words='english')
         self.tfidf_matrix = self.vectorizer.fit_transform(self.df['soup'])
         self.cosine_sim = cosine_similarity(self.tfidf_matrix, self.tfidf_matrix)
