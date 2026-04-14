@@ -14,8 +14,8 @@ export default function MovieCard({ movie, index = 0, onClick, compact = false }
 
   useEffect(() => {
     if (!posterPath && !imgError && movie.title) {
-      // Using a standard public dummy TMDB key for tutorial/portfolio projects
-      fetch(`https://api.themoviedb.org/3/search/movie?api_key=4e44d9029b1270a757cddc766a1bcb63&query=${encodeURIComponent(movie.title)}`)
+      const TMDB_KEY = import.meta.env.VITE_TMDB_KEY || '4e44d9029b1270a757cddc766a1bcb63';
+      fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(movie.title)}`)
         .then(res => res.json())
         .then(data => {
             if (data.results && data.results.length > 0 && data.results[0].poster_path) {

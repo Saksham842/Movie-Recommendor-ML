@@ -64,5 +64,24 @@ CineRecML is a professional, full-stack movie recommendation system that analyze
 - Implemented **TF-IDF NLP pipelines** to map cinematic similarity across high-dimensional feature spaces.
 - Orchestrated a modern UI using **React 19** and **GSAP**, achieving fluid animations and an **80% reduction in image payload size** through asset optimization.
 
+## 🚀 Production Deployment
+
+This project is designed for zero-config deployment on **Render** (Backend) and **Vercel** (Frontend).
+
+### 1. Backend: Render
+1.  **Create Web Service**: Connect your GitHub repository.
+2.  **Environment**: Select `Python` and set the following settings:
+    - **Build Command**: `pip install -r requirements.txt`
+    - **Start Command**: `gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app`
+3.  **Advanced**: Add `PYTHON_VERSION` if necessary (e.g., `3.10.x`).
+
+### 2. Frontend: Vercel
+1.  **Project Setup**: Import your repository.
+2.  **Framework**: Select `Vite`.
+3.  **Root Directory**: Set to `frontend`.
+4.  **Environment Variables**: Add the following in the Vercel Dashboard:
+    - `VITE_TMDB_KEY`: Your TMDB API Key.
+    - `VITE_API_BASE_URL`: The URL provided by Render (e.g., `https://your-api.onrender.com`).
+
 ---
 *Created by [Saksham](https://github.com/Saksham842)*

@@ -6,8 +6,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { ArrowLeft, Brain, Zap } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 
-const API = 'http://localhost:8000';
-const TMDB_KEY = '4e44d9029b1270a757cddc766a1bcb63';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const TMDB_KEY = import.meta.env.VITE_TMDB_KEY || '4e44d9029b1270a757cddc766a1bcb63';
 const GOLD = '#f5c518';
 
 const pageVariants = {

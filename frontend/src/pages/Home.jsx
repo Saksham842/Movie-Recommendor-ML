@@ -7,7 +7,7 @@ import MovieCard from '../components/MovieCard';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API = 'http://localhost:8000';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 // ── Hardcoded TMDB backdrop URLs for hero rotation ──────────────────────────
 const BACKDROPS = [
